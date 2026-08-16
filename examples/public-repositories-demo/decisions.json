@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-16T12:10:00+09:00",
+  "items": [
+    {
+      "id": "DEC-GH-001",
+      "kind": "standardize",
+      "priority": "high",
+      "status": "open",
+      "target_node_ids": ["KNO-GH-003"],
+      "title": "外部LLM送信前の安全ゲートを共通部品化する",
+      "reason": "2つのrepositoryで同じ目的が確認され、pdf2csvでは検出と送信中断の実装も確認できるため。",
+      "signals": {"independent_scopes": 2, "repositories": 2, "evidence": 4, "implementation_evidence": 2, "unresolved_conflicts": 0},
+      "recommended_action": "検出対象、誤検知時の扱い、画像入力時の限界を整理し、共通ライブラリ化を検討する。",
+      "caution": "aiagent_workspace側はREADMEの記載確認に留まり、同じ実装方式とは限らない。"
+    },
+    {
+      "id": "DEC-GH-002",
+      "kind": "resolve-conflict",
+      "priority": "high",
+      "status": "open",
+      "target_node_ids": ["KNO-GH-001", "KNO-GH-002"],
+      "title": "API keyの保存方針を製品間で統一する",
+      "reason": "pdf2csvはOS資格情報ストアを案内し、cut-in-meterは.envへの設定を案内しているため。",
+      "signals": {"independent_scopes": 2, "repositories": 2, "evidence": 2, "implementation_evidence": 0, "unresolved_conflicts": 1},
+      "recommended_action": "個人試用と組織配布を分け、組織配布ではOS資格情報ストアまたは管理環境変数を標準にする。",
+      "caution": "READMEの時点と製品の配布対象が異なる可能性を確認する。"
+    },
+    {
+      "id": "DEC-GH-003",
+      "kind": "standardize",
+      "priority": "high",
+      "status": "open",
+      "target_node_ids": ["KNO-GH-004", "KNO-GH-009"],
+      "title": "入力不変と出典保持をデータ処理製品の共通原則にする",
+      "reason": "3つのrepositoryで入力と派生物の分離が確認され、stock_market_indexではsource_fileも実装されているため。",
+      "signals": {"independent_scopes": 3, "repositories": 3, "evidence": 6, "implementation_evidence": 1, "unresolved_conflicts": 0},
+      "recommended_action": "入力変更禁止、派生物の分離、source URI保持を共通チェックリストにする。",
+      "caution": "各製品の保持期間と削除方針は別途決める。"
+    },
+    {
+      "id": "DEC-GH-004",
+      "kind": "reuse",
+      "priority": "medium",
+      "status": "open",
+      "target_node_ids": ["KNO-GH-005"],
+      "title": "Windows向けセットアップを共通テンプレート化する",
+      "reason": "3つのrepositoryでZIP展開とsetup script中心の導入方法が繰り返されているため。",
+      "signals": {"independent_scopes": 3, "repositories": 3, "evidence": 3, "implementation_evidence": 0, "unresolved_conflicts": 0},
+      "recommended_action": "Python検出、venv作成、依存導入、状態確認を共通installer部品として比較する。",
+      "caution": "管理者権限が必要な製品と不要な製品を同じ手順にしない。"
+    },
+    {
+      "id": "DEC-GH-005",
+      "kind": "reuse",
+      "priority": "medium",
+      "status": "open",
+      "target_node_ids": ["KNO-GH-007", "KNO-GH-008"],
+      "title": "Connector拡張へadapter・pluginパターンを再利用する",
+      "reason": "c4とKUMONOSが差し替え境界を文書化し、tweepybotではplugin loaderとCI matrixが実装されているため。",
+      "signals": {"independent_scopes": 3, "repositories": 3, "evidence": 5, "implementation_evidence": 2, "unresolved_conflicts": 0},
+      "recommended_action": "GitHub Connectorをprovider adapterとsource pluginに分ける小規模プロトタイプを作る。",
+      "caution": "顧客別secretをmatrix式へ直接増やす方式は、大規模化時の保守性を別途確認する。"
+    },
+    {
+      "id": "DEC-GH-006",
+      "kind": "verify",
+      "priority": "low",
+      "status": "open",
+      "target_node_ids": ["KNO-GH-006"],
+      "title": "権限要求前の説明パターンを他製品でも検証する",
+      "reason": "LIFELOOPでは価値のあるパターンだが、公開repository内で独立した別事例がまだないため。",
+      "signals": {"independent_scopes": 1, "repositories": 1, "evidence": 2, "implementation_evidence": 1, "unresolved_conflicts": 0},
+      "recommended_action": "カメラ、ファイル、外部送信を使う別製品で同じ導線が有効か確認する。",
+      "caution": "OSごとに権限ダイアログと審査要件が異なる。"
+    }
+  ]
+}

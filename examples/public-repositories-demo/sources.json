@@ -1,0 +1,133 @@
+{
+  "schema_version": "1.0",
+  "retrieved_at": "2026-08-16T12:00:00+09:00",
+  "security_scope": "public",
+  "sources": [
+    {
+      "id": "SRC-001",
+      "repository": "ganase/aiagent_workspace",
+      "commit_sha": "fdd618cc9c2b1fb837cdbb4b337eddc3bf15fe3c",
+      "path": "README.md",
+      "content_sha": "aad83590c17abdb4610d3b6e49d2ecf1df99af03",
+      "evidence_kind": "documentation",
+      "url": "https://github.com/ganase/aiagent_workspace/blob/fdd618cc9c2b1fb837cdbb4b337eddc3bf15fe3c/README.md"
+    },
+    {
+      "id": "SRC-002",
+      "repository": "ganase/c4",
+      "commit_sha": "6d99e504b760bfce6f8ae5a70be6a0c02553457d",
+      "path": "README.md",
+      "content_sha": "b68aa7ae16bd5bc97ecf45ca3dbc979d6573ba4d",
+      "evidence_kind": "documentation",
+      "url": "https://github.com/ganase/c4/blob/6d99e504b760bfce6f8ae5a70be6a0c02553457d/README.md"
+    },
+    {
+      "id": "SRC-003",
+      "repository": "knockknock-at/cut-in-meter",
+      "commit_sha": "8930d1407d3cecf42c841dffae50b8938c772c41",
+      "path": "README.md",
+      "content_sha": "eef615dfb0f813bbfbc37751230b749de9204199",
+      "evidence_kind": "documentation",
+      "url": "https://github.com/knockknock-at/cut-in-meter/blob/8930d1407d3cecf42c841dffae50b8938c772c41/README.md"
+    },
+    {
+      "id": "SRC-004",
+      "repository": "ganase/pdf2csv",
+      "commit_sha": "541d88bbfdfe0b76d1dac7c79f7bb499cbcfb4a9",
+      "path": "README.md",
+      "content_sha": "439ea75e3318f2128f84e0eff3ee2c00c80d0711",
+      "evidence_kind": "documentation",
+      "url": "https://github.com/ganase/pdf2csv/blob/541d88bbfdfe0b76d1dac7c79f7bb499cbcfb4a9/README.md"
+    },
+    {
+      "id": "SRC-005",
+      "repository": "ganase/pdf2csv",
+      "commit_sha": "541d88bbfdfe0b76d1dac7c79f7bb499cbcfb4a9",
+      "path": "app/services/pii_detector.py",
+      "content_sha": "0a3b557e22c3acc14ff4522be5eae3472b6b720f",
+      "evidence_kind": "implementation",
+      "url": "https://github.com/ganase/pdf2csv/blob/541d88bbfdfe0b76d1dac7c79f7bb499cbcfb4a9/app/services/pii_detector.py"
+    },
+    {
+      "id": "SRC-006",
+      "repository": "ganase/pdf2csv",
+      "commit_sha": "541d88bbfdfe0b76d1dac7c79f7bb499cbcfb4a9",
+      "path": "app/services/pdf_process_svc.py",
+      "content_sha": "6b44e8b419acd0276cb81bb9db7c6bcbf459ed62",
+      "evidence_kind": "implementation",
+      "url": "https://github.com/ganase/pdf2csv/blob/541d88bbfdfe0b76d1dac7c79f7bb499cbcfb4a9/app/services/pdf_process_svc.py"
+    },
+    {
+      "id": "SRC-007",
+      "repository": "knockknock-at/lifeloop",
+      "commit_sha": "ef218a09afecace9f8f91f5281e97d9551f0684f",
+      "path": "README.md",
+      "content_sha": "d33f98108878409d3a6a4db916bf8365fd10b5b0",
+      "evidence_kind": "documentation",
+      "url": "https://github.com/knockknock-at/lifeloop/blob/ef218a09afecace9f8f91f5281e97d9551f0684f/README.md"
+    },
+    {
+      "id": "SRC-008",
+      "repository": "knockknock-at/lifeloop",
+      "commit_sha": "ef218a09afecace9f8f91f5281e97d9551f0684f",
+      "path": "Services/LocationService.swift",
+      "content_sha": "f8e4ee0cd80bb6cc607c6029c19e27ead4e3781b",
+      "evidence_kind": "implementation",
+      "url": "https://github.com/knockknock-at/lifeloop/blob/ef218a09afecace9f8f91f5281e97d9551f0684f/Services/LocationService.swift"
+    },
+    {
+      "id": "SRC-009",
+      "repository": "ganase/stock_market_index",
+      "commit_sha": "c1d49b6612308664070e15045b05049fe2cbbf29",
+      "path": "README.md",
+      "content_sha": "34334417c6fda309d2d59c289cd7fb46cb4fff43",
+      "evidence_kind": "documentation",
+      "url": "https://github.com/ganase/stock_market_index/blob/c1d49b6612308664070e15045b05049fe2cbbf29/README.md"
+    },
+    {
+      "id": "SRC-010",
+      "repository": "ganase/stock_market_index",
+      "commit_sha": "c1d49b6612308664070e15045b05049fe2cbbf29",
+      "path": "scripts/build_and_publish_tableau_feed.py",
+      "content_sha": "2516920b95a5102abb7728f4796448db006f66f3",
+      "evidence_kind": "implementation",
+      "url": "https://github.com/ganase/stock_market_index/blob/c1d49b6612308664070e15045b05049fe2cbbf29/scripts/build_and_publish_tableau_feed.py"
+    },
+    {
+      "id": "SRC-011",
+      "repository": "ganase/tweepybot",
+      "commit_sha": "f26c57950d7d1446f1d2243b6666aebef03cc866",
+      "path": "README.md",
+      "content_sha": "968edd1db10d0ccebbb4687b4560516ebc876bb7",
+      "evidence_kind": "documentation",
+      "url": "https://github.com/ganase/tweepybot/blob/f26c57950d7d1446f1d2243b6666aebef03cc866/README.md"
+    },
+    {
+      "id": "SRC-012",
+      "repository": "ganase/tweepybot",
+      "commit_sha": "f26c57950d7d1446f1d2243b6666aebef03cc866",
+      "path": ".github/workflows/bot.yml",
+      "content_sha": "58e086c69d70d2d5a74726acadaf41eb5f8d5c31",
+      "evidence_kind": "implementation",
+      "url": "https://github.com/ganase/tweepybot/blob/f26c57950d7d1446f1d2243b6666aebef03cc866/.github/workflows/bot.yml"
+    },
+    {
+      "id": "SRC-013",
+      "repository": "ganase/tweepybot",
+      "commit_sha": "f26c57950d7d1446f1d2243b6666aebef03cc866",
+      "path": "plugin_loader.py",
+      "content_sha": "59a095c854d55eb4305d7c95b28501936456edb3",
+      "evidence_kind": "implementation",
+      "url": "https://github.com/ganase/tweepybot/blob/f26c57950d7d1446f1d2243b6666aebef03cc866/plugin_loader.py"
+    },
+    {
+      "id": "SRC-014",
+      "repository": "knockknock-at/kumonos",
+      "commit_sha": "fe58ea655d1bc3d664a3db2f7e7ce0878869aa7b",
+      "path": "README.md",
+      "content_sha": "95fd78beb5b36fc6437956a3beb2a2ee71702da0",
+      "evidence_kind": "documentation",
+      "url": "https://github.com/knockknock-at/kumonos/blob/fe58ea655d1bc3d664a3db2f7e7ce0878869aa7b/README.md"
+    }
+  ]
+}

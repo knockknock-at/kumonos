@@ -6,6 +6,7 @@
 
 - Codex session／rollout JSONLのサンプル調査
 - Claude Code project／conversation JSONLのサンプル調査
+- GitHub.com公開リポジトリのREADME／docs／tree APIのサンプル調査
 - 1セッション当たりのサイズ、Turn数、ノイズ比率を計測
 - credential・個人識別情報の出現パターンを確認
 - 共通Session／Turn schemaを決定
@@ -26,6 +27,7 @@
 - 内容ハッシュによるmanifest管理
 - Codex Connector
 - Claude Code Connector
+- GitHub Connector（公開GitHub.com、README／docs）
 - Normalizer
 - Sanitizer
 - LLM provider interface
@@ -43,6 +45,7 @@
 - 元セッションを各Nodeから追跡できる
 - Obsidianなしで処理が完了する
 - ブラウザで判断候補と知識の関係を確認できる
+- 公開GitHubリポジトリから生成した知識がcommitとpathへ追跡できる
 
 ## Phase 2: KUMONOSとしての知識統合
 
@@ -55,6 +58,8 @@
 - review queue
 - Obsidian Markdown Renderer
 - 実データを使った静的HTMLの絞り込み・詳細表示
+- GitHub認証、private repository、GitHub Enterprise Cloud／Server
+- GitHub App認証とrepository単位のread-only権限
 
 ### 完了条件
 
@@ -69,6 +74,7 @@
 - 排他制御と障害回復
 - 利用量・費用上限
 - 部署・アクセス範囲別の出力分離
+- corporate proxy、独自CA、GitHub Enterprise Server互換性テスト
 - 監査・保持期間設定
 - schema migration
 - バックアップ・restore手順

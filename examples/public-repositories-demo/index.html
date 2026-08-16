@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KUMONOS — 公開リポジトリ横断デモ</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink:#17212b; --muted:#687584; --line:#dbe2e8; --panel:#fff; --canvas:#f3f6f7;
+      --brand:#253f49; --brand-soft:#e6f0f1; --high:#bd3f38; --medium:#9c6118; --low:#5f6b77;
+      --candidate:#148363; --repeated:#526dde; --observed:#d78218;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+    }
+    *{box-sizing:border-box} body{margin:0;color:var(--ink);background:var(--canvas)} button,a{font:inherit} button{color:inherit}
+    header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 28px;color:#fff;background:var(--brand)}
+    .brand{display:flex;align-items:baseline;gap:12px}.brand strong{font-size:22px;letter-spacing:.08em}.brand span,header small{color:#c9dfe1}
+    main{max-width:1500px;margin:0 auto;padding:22px}.notice{margin-bottom:16px;padding:12px 15px;border:1px solid #bcd0d3;border-radius:10px;color:#31535a;background:#edf6f7;font-size:14px;line-height:1.6}
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.metric,.panel{border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 2px 8px rgb(23 33 43 / 4%)}
+    .metric{padding:16px}.metric strong{display:block;margin-bottom:4px;font-size:27px}.metric span{color:var(--muted);font-size:13px}.metric.alert strong{color:var(--high)}
+    .workspace{display:grid;grid-template-columns:190px minmax(560px,1fr) 350px;min-height:620px;overflow:hidden}.filters,.details{padding:18px}.filters{border-right:1px solid var(--line)}.details{border-left:1px solid var(--line)}.graph-area{min-width:0;background:#fbfcfd}
+    h2,h3,p{margin-top:0}h2{margin-bottom:14px;font-size:17px}h3{margin-bottom:8px;font-size:14px}.muted{color:var(--muted)}
+    .filter-list{display:grid;gap:8px}.filter-button{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:8px;text-align:left;background:#fff;cursor:pointer}.filter-button:hover{background:#f6f9fa}.filter-button.active{border-color:#6c9399;background:var(--brand-soft);font-weight:700}.filter-count{float:right;color:var(--muted)}
+    .legend{display:grid;gap:8px;margin-top:25px;color:var(--muted);font-size:12px}.legend-item{display:flex;align-items:center;gap:8px}.dot{width:11px;height:11px;border-radius:50%}.dot.candidate{background:var(--candidate)}.dot.repeated{background:var(--repeated)}.dot.observed{background:var(--observed)}
+    .source-note{margin-top:24px;padding:11px;border-radius:8px;background:#f5f7f8;color:var(--muted);font-size:12px;line-height:1.6}
+    .graph-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 0}.graph-head p{margin:0;font-size:12px}svg{display:block;width:100%;height:540px}.edge{stroke:#9caab5;stroke-width:2;opacity:.72}.edge.conflict{stroke:#c34942;stroke-width:3;stroke-dasharray:8 6}.edge-label{fill:#64717c;font-size:11px;paint-order:stroke;stroke:#fff;stroke-width:5px}.node{cursor:pointer;transition:opacity .18s}.node circle{stroke:#fff;stroke-width:5;filter:drop-shadow(0 3px 5px rgb(31 48 61 / 18%))}.node:hover circle,.node.selected circle{stroke:#17212b}.node-title{fill:#17212b;font-size:12px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}.node-type{fill:#fff;font-size:10px;font-weight:700;text-anchor:middle}.hidden{opacity:.09;pointer-events:none}
+    .badge{display:inline-block;margin:0 5px 6px 0;padding:4px 7px;border-radius:999px;color:#34515a;background:#e9f1f2;font-size:12px;font-weight:650}.detail-title{margin-bottom:8px;font-size:20px;line-height:1.45}.detail-summary{margin:8px 0 17px;color:#42515e;line-height:1.7}.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 18px}.fact{padding:10px;border-radius:8px;background:#f4f7f8}.fact strong{display:block;margin-bottom:2px;font-size:18px}.fact span{color:var(--muted);font-size:11px}.repo-list{display:grid;gap:6px;margin:8px 0 16px}.repo{padding:7px 9px;border-radius:7px;background:#f4f7f8;font-size:12px}.action-box{margin-top:15px;padding:13px;border-left:4px solid var(--candidate);border-radius:6px;background:#eff8f5}.action-box p{margin-bottom:0;line-height:1.6;font-size:13px}.note-link{display:inline-block;margin-top:15px;color:#1e6571;font-weight:700}
+    .decisions{margin-top:16px;padding:20px}.section-head{display:flex;justify-content:space-between;gap:16px;align-items:baseline}.section-head p{margin:0;font-size:13px}.decision-list{display:grid;gap:10px;margin-top:14px}.decision{display:grid;grid-template-columns:92px minmax(220px,1.05fr) minmax(260px,1.35fr) minmax(260px,1.35fr);gap:14px;align-items:start;width:100%;padding:14px;border:1px solid var(--line);border-radius:9px;text-align:left;background:#fff;cursor:pointer}.decision:hover{border-color:#829da2;background:#fbfdfd}.priority{font-size:12px;font-weight:750}.priority.high{color:var(--high)}.priority.medium{color:var(--medium)}.priority.low{color:var(--low)}.decision strong{display:block;margin-bottom:5px}.decision p{margin:0;color:#52606c;font-size:13px;line-height:1.55}.column-label{display:block;margin-bottom:4px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.04em}footer{padding:18px 4px 4px;color:var(--muted);font-size:12px;text-align:center}
+    @media(max-width:1100px){.workspace{grid-template-columns:170px 1fr}.details{grid-column:1/-1;border-top:1px solid var(--line);border-left:0}.decision{grid-template-columns:80px 1fr}.decision>div:nth-child(n+3){grid-column:2}}
+    @media(max-width:720px){header{align-items:flex-start;flex-direction:column}main{padding:12px}.metrics{grid-template-columns:1fr 1fr}.workspace{display:block}.filters{border-right:0;border-bottom:1px solid var(--line)}.filter-list{grid-template-columns:1fr 1fr}.graph-area{overflow-x:auto}svg{min-width:760px}.details{border-left:0}.decision{display:block}.decision>div{margin-bottom:10px}}
+  </style>
+</head>
+<body>
+  <header><div class="brand"><strong>KUMONOS</strong><span>公開リポジトリ横断デモ</span></div><small>2026-08-16 / public scope / 手作業で構成したダミー出力</small></header>
+  <main>
+    <div class="notice">knockknock-atとganaseの公開repositoryを横断した例です。READMEに書かれた内容と、codeで確認できた内容を分け、組織として次に判断すべきことを表示しています。</div>
+    <section class="metrics" aria-label="概要">
+      <div class="metric"><strong>8</strong><span>参照した公開repository</span></div>
+      <div class="metric"><strong>9</strong><span>編成された知識メモ</span></div>
+      <div class="metric alert"><strong>6</strong><span>判断候補</span></div>
+      <div class="metric"><strong>6</strong><span>実装fileによる根拠</span></div>
+    </section>
+
+    <section class="workspace panel">
+      <aside class="filters">
+        <h2>判断で絞る</h2>
+        <div class="filter-list">
+          <button class="filter-button active" data-filter="all">すべて<span class="filter-count">9</span></button>
+          <button class="filter-button" data-filter="standardize">標準化<span class="filter-count">3</span></button>
+          <button class="filter-button" data-filter="resolve-conflict">食い違い<span class="filter-count">2</span></button>
+          <button class="filter-button" data-filter="reuse">横展開<span class="filter-count">3</span></button>
+          <button class="filter-button" data-filter="verify">要検証<span class="filter-count">1</span></button>
+        </div>
+        <div class="legend"><h3>色は知識の成熟度</h3><div class="legend-item"><span class="dot candidate"></span>標準化候補</div><div class="legend-item"><span class="dot repeated"></span>複数repositoryで確認</div><div class="legend-item"><span class="dot observed"></span>一つの事例で確認</div></div>
+        <div class="source-note">Nodeの大きさは根拠数を示します。太い赤の破線は、方針の食い違いです。</div>
+      </aside>
+
+      <div class="graph-area">
+        <div class="graph-head"><h2>repositoryを横断した知識</h2><p class="muted">Nodeを選ぶと出典と次の判断を表示</p></div>
+        <svg viewBox="0 0 940 540" role="img" aria-label="公開リポジトリから抽出した知識ネットワーク">
+          <g class="edge-group" data-source="KNO-GH-001" data-target="KNO-GH-002"><line class="edge conflict" x1="170" y1="105" x2="355" y2="105"></line><text class="edge-label" x="220" y="89">保存方針が異なる</text></g>
+          <g class="edge-group" data-source="KNO-GH-001" data-target="KNO-GH-003"><line class="edge" x1="155" y1="145" x2="225" y2="245"></line></g>
+          <g class="edge-group" data-source="KNO-GH-002" data-target="KNO-GH-005"><line class="edge" x1="385" y1="145" x2="435" y2="245"></line></g>
+          <g class="edge-group" data-source="KNO-GH-003" data-target="KNO-GH-006"><line class="edge" x1="275" y1="310" x2="410" y2="420"></line></g>
+          <g class="edge-group" data-source="KNO-GH-005" data-target="KNO-GH-006"><line class="edge" x1="465" y1="310" x2="455" y2="410"></line></g>
+          <g class="edge-group" data-source="KNO-GH-004" data-target="KNO-GH-009"><line class="edge" x1="685" y1="160" x2="780" y2="255"></line><text class="edge-label" x="718" y="202">出典を使う</text></g>
+          <g class="edge-group" data-source="KNO-GH-004" data-target="KNO-GH-003"><line class="edge" x1="610" y1="145" x2="290" y2="270"></line></g>
+          <g class="edge-group" data-source="KNO-GH-007" data-target="KNO-GH-008"><line class="edge" x1="660" y1="430" x2="790" y2="450"></line><text class="edge-label" x="700" y="426">拡張方法</text></g>
+
+          <g class="node" data-id="KNO-GH-001" tabindex="0" role="button"><circle cx="125" cy="105" r="48" fill="#d78218"></circle><text class="node-type" x="125" y="110">手順</text><text class="node-title" x="125" y="171"><tspan x="125">OS資格情報</tspan><tspan x="125" dy="17">ストア</tspan></text></g>
+          <g class="node" data-id="KNO-GH-002" tabindex="0" role="button"><circle cx="400" cy="105" r="43" fill="#d78218"></circle><text class="node-type" x="400" y="110">手順</text><text class="node-title" x="400" y="167"><tspan x="400">.envへ</tspan><tspan x="400" dy="17">API key</tspan></text></g>
+          <g class="node selected" data-id="KNO-GH-003" tabindex="0" role="button"><circle cx="250" cy="280" r="62" fill="#148363"></circle><text class="node-type" x="250" y="285">安全</text><text class="node-title" x="250" y="363"><tspan x="250">外部LLM送信前</tspan><tspan x="250" dy="17">安全ゲート</tspan></text></g>
+          <g class="node" data-id="KNO-GH-005" tabindex="0" role="button"><circle cx="450" cy="280" r="55" fill="#526dde"></circle><text class="node-type" x="450" y="285">導入</text><text class="node-title" x="450" y="354"><tspan x="450">ダブルクリック</tspan><tspan x="450" dy="17">導入</tspan></text></g>
+          <g class="node" data-id="KNO-GH-006" tabindex="0" role="button"><circle cx="440" cy="455" r="46" fill="#d78218"></circle><text class="node-type" x="440" y="460">UX</text><text class="node-title" x="440" y="518"><tspan x="440">説明してから</tspan><tspan x="440" dy="17">権限要求</tspan></text></g>
+          <g class="node" data-id="KNO-GH-004" tabindex="0" role="button"><circle cx="650" cy="120" r="62" fill="#148363"></circle><text class="node-type" x="650" y="125">データ</text><text class="node-title" x="650" y="201"><tspan x="650">入力不変と</tspan><tspan x="650" dy="17">派生物分離</tspan></text></g>
+          <g class="node" data-id="KNO-GH-009" tabindex="0" role="button"><circle cx="815" cy="290" r="48" fill="#d78218"></circle><text class="node-type" x="815" y="295">出典</text><text class="node-title" x="815" y="355"><tspan x="815">source_fileを</tspan><tspan x="815" dy="17">残す</tspan></text></g>
+          <g class="node" data-id="KNO-GH-007" tabindex="0" role="button"><circle cx="620" cy="425" r="50" fill="#526dde"></circle><text class="node-type" x="620" y="430">設計</text><text class="node-title" x="620" y="493"><tspan x="620">adapterで</tspan><tspan x="620" dy="17">差を隔離</tspan></text></g>
+          <g class="node" data-id="KNO-GH-008" tabindex="0" role="button"><circle cx="835" cy="465" r="50" fill="#d78218"></circle><text class="node-type" x="835" y="470">拡張</text><text class="node-title" x="835" y="530"><tspan x="835">pluginと</tspan><tspan x="835" dy="17">CI matrix</tspan></text></g>
+        </svg>
+      </div>
+
+      <aside class="details" aria-live="polite"><h2>選択した知識</h2><div id="node-details"></div></aside>
+    </section>
+
+    <section class="decisions panel"><div class="section-head"><h2>組織として判断する候補</h2><p class="muted">事実・推論・実装確認を分けて表示</p></div><div id="decision-list" class="decision-list"></div></section>
+    <footer>公開情報から手作業で構成したKUMONOS出力イメージです。実際のKUMONOS実行結果ではありません。</footer>
+  </main>
+
+  <script>
+    const nodes={
+      "KNO-GH-001":{type:"手順",title:"API keyはOS資格情報ストアまたは管理環境変数へ保存する",summary:"利用者向け端末ではOS資格情報ストア、組織管理では変更不能な環境変数を使います。",lifecycle:"一つの事例",confidence:94,evidence:1,implementation:0,repos:["ganase/pdf2csv"],validation:"READMEで確認",note:"notes/KNO-GH-001.md",action:".env方式との使い分けを含め、組織の資格情報保存標準を決めます。"},
+      "KNO-GH-002":{type:"手順",title:"セットアップ時に.envへAPI keyを設定する",summary:"ローカルアプリの初期設定として.envへOPENAI_API_KEYを記入します。",lifecycle:"一つの事例",confidence:97,evidence:1,implementation:0,repos:["knockknock-at/cut-in-meter"],validation:"READMEで確認",note:"notes/KNO-GH-002.md",action:"個人試用では許容するか、組織配布では別方式へ移すか判断します。"},
+      "KNO-GH-003":{type:"安全手順",title:"外部LLM送信前にPII・秘密情報を検査する",summary:"外部モデルへ送る直前に機密らしい内容を検出し、該当時は送信を止めます。",lifecycle:"標準化候補",confidence:96,evidence:4,implementation:2,repos:["ganase/pdf2csv","ganase/aiagent_workspace"],validation:"実装fileで確認",note:"notes/KNO-GH-003.md",action:"検出対象と限界を整理し、共通安全ゲートとして部品化するか判断します。"},
+      "KNO-GH-004":{type:"データ手順",title:"元データを変更せず派生物を別に保存する",summary:"入力を正本として残し、加工結果を再生成可能な別領域へ出します。",lifecycle:"標準化候補",confidence:94,evidence:4,implementation:1,repos:["ganase/pdf2csv","ganase/stock_market_index","knockknock-at/kumonos"],validation:"README＋実装",note:"notes/KNO-GH-004.md",action:"入力不変、派生物分離、出典保持を共通チェックリストにします。"},
+      "KNO-GH-005":{type:"導入手順",title:"非技術者向け導入をダブルクリック中心にする",summary:"ZIP展開後のsetup scriptを入口にし、コマンド入力を減らします。",lifecycle:"複数で確認",confidence:92,evidence:3,implementation:0,repos:["ganase/aiagent_workspace","ganase/pdf2csv","knockknock-at/cut-in-meter"],validation:"READMEで確認",note:"notes/KNO-GH-005.md",action:"Windows installerの共通部品と表示規約を比較します。"},
+      "KNO-GH-006":{type:"UX手順",title:"OS権限は目的を説明してから段階的に要求する",summary:"起動直後に権限dialogを出さず、目的を説明してから必要な権限へ進みます。",lifecycle:"一つの事例",confidence:90,evidence:2,implementation:1,repos:["knockknock-at/lifeloop"],validation:"一部実装を確認",note:"notes/KNO-GH-006.md",action:"カメラや外部送信を使う別製品でも同じ導線を検証します。"},
+      "KNO-GH-007":{type:"設計判断",title:"外部AIエンジンの差をadapterへ閉じ込める",summary:"外部system固有の差をadapterやConnectorへ閉じ込め、中核を共通化します。",lifecycle:"複数で確認",confidence:88,evidence:2,implementation:0,repos:["ganase/c4","knockknock-at/kumonos"],validation:"設計文書で確認",note:"notes/KNO-GH-007.md",action:"GitHub.comとEnterpriseの差をprovider adapterで扱うprototypeを作ります。"},
+      "KNO-GH-008":{type:"拡張手順",title:"顧客別処理をpluginとCI matrixで増やす",summary:"顧客固有処理をpluginへ分け、CI matrixで同じ経路を展開します。",lifecycle:"一つの事例",confidence:95,evidence:3,implementation:2,repos:["ganase/tweepybot"],validation:"実装fileで確認",note:"notes/KNO-GH-008.md",action:"Connector pluginへ応用しつつ、大規模化時の設定管理を検討します。"},
+      "KNO-GH-009":{type:"出典手順",title:"派生データにsource_fileを残す",summary:"分析向けに行を組み替えても、元fileへ戻れる列を残します。",lifecycle:"一つの事例",confidence:98,evidence:2,implementation:1,repos:["ganase/stock_market_index"],validation:"実装fileで確認",note:"notes/KNO-GH-009.md",action:"KUMONOSではcommit SHAとblob SHAも合わせて保持します。"}
+    };
+    const decisions=[
+      {kind:"standardize",priority:"high",label:"標準化",target:"KNO-GH-003",title:"外部LLM送信前の安全ゲートを共通部品化する",reason:"2つのrepositoryで同じ目的が確認され、検出と送信中断の実装もあります。",action:"検出対象、誤検知、画像入力時の限界を整理して共通化を検討します。"},
+      {kind:"resolve-conflict",priority:"high",label:"食い違い",target:"KNO-GH-001",title:"API keyの保存方針を製品間で統一する",reason:"OS資格情報ストア方式と.env方式が、別製品のREADMEに併存しています。",action:"個人試用と組織配布を分け、組織向けの標準方式を決めます。"},
+      {kind:"standardize",priority:"high",label:"標準化",target:"KNO-GH-004",title:"入力不変と出典保持を共通原則にする",reason:"3つのrepositoryで繰り返され、source_fileの実装も確認できます。",action:"入力変更禁止、派生物分離、source URI保持を共通checklistにします。"},
+      {kind:"reuse",priority:"medium",label:"横展開",target:"KNO-GH-005",title:"Windows向けsetupを共通template化する",reason:"3つのrepositoryがZIP展開とsetup script中心の導入を採用しています。",action:"Python確認、venv作成、依存導入、状態確認を共通部品として比較します。"},
+      {kind:"reuse",priority:"medium",label:"横展開",target:"KNO-GH-007",title:"Connectorへadapter・plugin patternを再利用する",reason:"複数の設計文書とtweepybotの実装から、差し替え境界の例を確認できます。",action:"GitHub provider adapterとsource pluginの小さなprototypeを作ります。"},
+      {kind:"verify",priority:"low",label:"要検証",target:"KNO-GH-006",title:"権限要求前の説明を他製品でも検証する",reason:"LIFELOOPでは確認できますが、独立した別事例がまだありません。",action:"カメラ、file access、外部送信を使う別製品で有効性を確認します。"}
+    ];
+    const filterNodes={standardize:["KNO-GH-003","KNO-GH-004","KNO-GH-009"],"resolve-conflict":["KNO-GH-001","KNO-GH-002"],reuse:["KNO-GH-005","KNO-GH-007","KNO-GH-008"],verify:["KNO-GH-006"]};
+    let activeFilter="all";
+    function selectNode(id){const n=nodes[id];document.querySelectorAll(".node").forEach(el=>el.classList.toggle("selected",el.dataset.id===id));document.getElementById("node-details").innerHTML=`<span class="badge">${id}</span><span class="badge">${n.type}</span><span class="badge">${n.lifecycle}</span><h3 class="detail-title">${n.title}</h3><p class="detail-summary">${n.summary}</p><div class="facts"><div class="fact"><strong>${n.evidence}</strong><span>根拠file</span></div><div class="fact"><strong>${n.implementation}</strong><span>実装で確認</span></div><div class="fact"><strong>${n.confidence}%</strong><span>確からしさ</span></div><div class="fact"><strong>${n.repos.length}</strong><span>repository</span></div></div><h3>確認したrepository</h3><div class="repo-list">${n.repos.map(repo=>`<div class="repo">${repo}</div>`).join("")}</div><span class="badge">${n.validation}</span><div class="action-box"><h3>次に判断すること</h3><p>${n.action}</p></div><a class="note-link" href="${n.note}">メモ本文と固定commitを見る →</a>`}
+    function renderDecisions(){const visible=activeFilter==="all"?decisions:decisions.filter(d=>d.kind===activeFilter);document.getElementById("decision-list").innerHTML=visible.map(d=>`<button class="decision" data-target="${d.target}"><div><span class="column-label">優先度</span><span class="priority ${d.priority}">${d.priority==="high"?"高":d.priority==="medium"?"中":"低"}・${d.label}</span></div><div><span class="column-label">判断すること</span><strong>${d.title}</strong><p>${d.target}</p></div><div><span class="column-label">候補になった理由</span><p>${d.reason}</p></div><div><span class="column-label">推奨する次の行動</span><p>${d.action}</p></div></button>`).join("");document.querySelectorAll(".decision").forEach(b=>b.addEventListener("click",()=>selectNode(b.dataset.target)))}
+    function setFilter(filter){activeFilter=filter;document.querySelectorAll(".filter-button").forEach(b=>b.classList.toggle("active",b.dataset.filter===filter));const ids=new Set(filter==="all"?Object.keys(nodes):filterNodes[filter]);document.querySelectorAll(".node").forEach(el=>el.classList.toggle("hidden",!ids.has(el.dataset.id)));document.querySelectorAll(".edge-group").forEach(el=>el.classList.toggle("hidden",!(ids.has(el.dataset.source)&&ids.has(el.dataset.target))));renderDecisions();const first=[...ids][0];if(first)selectNode(first)}
+    document.querySelectorAll(".node").forEach(el=>{el.addEventListener("click",()=>selectNode(el.dataset.id));el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")selectNode(el.dataset.id)})});document.querySelectorAll(".filter-button").forEach(b=>b.addEventListener("click",()=>setFilter(b.dataset.filter)));selectNode("KNO-GH-003");renderDecisions();
+  </script>
+</body>
+</html>

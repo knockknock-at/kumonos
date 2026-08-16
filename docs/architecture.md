@@ -4,7 +4,7 @@
 
 KUMONOS本体は、入力元と出力先の双方から独立した知識編成パイプラインとする。
 
-Codex、Claude Code、汎用文書などはConnectorで接続し、Obsidian、JSON、HTMLなどはRendererで接続する。中核の知識モデルは、どのConnector／Rendererにも依存させない。
+Codex、Claude Code、GitHub、汎用文書などはConnectorで接続し、Obsidian、JSON、HTMLなどはRendererで接続する。中核の知識モデルは、どのConnector／Rendererにも依存させない。
 
 ## 2. 全体構成
 
@@ -41,6 +41,16 @@ Manifest ◄────────────── Graph Resolver / Linker /
 - 形式固有ノイズの識別
 
 Connectorは知識抽出やMarkdown生成を行わない。
+
+GitHub Connectorも同じ共通Source形式へ変換する。GitHub.com、GitHub Enterprise Cloud、GitHub Enterprise Serverの差は`api_base_url`、認証方式、利用可能APIの能力としてConnector内部へ閉じ込める。
+
+```text
+GitHub.com                 https://api.github.com
+GitHub Enterprise Cloud   https://api.<subdomain>.ghe.com
+GitHub Enterprise Server  https://<hostname>/api/v3
+```
+
+取得時はbranch名をcommit SHAへ解決し、各ファイルのblob SHAをmanifestへ保存する。GitHub上の入力を変更するAPIは使用しない。
 
 ### 3.2 Normalizer
 
@@ -186,6 +196,12 @@ MVPの静的HTMLは閲覧専用とする。判断結果は、例えば`kumonos r
 | `derivation` | extracted、inferred、ambiguous |
 | `evidence_uri` | 成果物、テスト、READMEなど |
 
+GitHubの出典は、表示用HTTPS URLに加えて次の形式の永続的な内部URIで表現する。
+
+```text
+github://<host>/<owner>/<repository>@<commit-sha>/<path>#L<start>-L<end>
+```
+
 ## 5. 処理状態
 
 ファイル処理と知識成熟度を混同しない。
@@ -230,6 +246,8 @@ source:
   include: <対象パターン>
   exclude: <除外パターン>
 ```
+
+GitHub入力は、ローカルフォルダと同じ`source`の一種として設定する。設定例は[GitHub入力の設計](github-connector.md)を参照する。
 
 特定製品向けの補助設定を将来提供する場合も、本体とは別に配布可能なサンプル設定または拡張パッケージとして扱う。製品名、固定パス、組織固有のディレクトリ規約を中核へ組み込まない。
 

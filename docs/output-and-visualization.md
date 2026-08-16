@@ -130,6 +130,8 @@ state/
 
 詳細な出典はMarkdownノートとGraph Storeへ保持する。閲覧用JSONには、出力先の権限を越える情報を含めない。
 
+GitHub入力では、repository、commit SHA、path、行範囲、blob SHAを出典として保持する。branch名だけでは内容が変わるため、再現用の識別子には使用しない。
+
 ## 6. `decisions.json`
 
 判断候補をグラフから独立して扱うためのデータである。画面の一覧、CLIレビュー、将来の通知機能が同じデータを利用する。

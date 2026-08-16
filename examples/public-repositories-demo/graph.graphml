@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+  <key id="title" for="node" attr.name="title" attr.type="string"/>
+  <key id="type" for="node" attr.name="type" attr.type="string"/>
+  <key id="lifecycle" for="node" attr.name="lifecycle" attr.type="string"/>
+  <key id="confidence" for="node" attr.name="confidence" attr.type="double"/>
+  <key id="repositories" for="node" attr.name="repositories" attr.type="string"/>
+  <key id="relation" for="edge" attr.name="relation" attr.type="string"/>
+  <graph id="KUMONOS-PUBLIC-REPOSITORIES" edgedefault="directed">
+    <node id="KNO-GH-001"><data key="title">API keyはOS資格情報ストアまたは管理環境変数へ保存する</data><data key="type">playbook</data><data key="lifecycle">observed</data><data key="confidence">0.94</data><data key="repositories">ganase/pdf2csv</data></node>
+    <node id="KNO-GH-002"><data key="title">セットアップ時に.envへAPI keyを設定する</data><data key="type">playbook</data><data key="lifecycle">observed</data><data key="confidence">0.97</data><data key="repositories">knockknock-at/cut-in-meter</data></node>
+    <node id="KNO-GH-003"><data key="title">外部LLM送信前にPII・秘密情報を検査する</data><data key="type">playbook</data><data key="lifecycle">candidate-standard</data><data key="confidence">0.96</data><data key="repositories">ganase/pdf2csv, ganase/aiagent_workspace</data></node>
+    <node id="KNO-GH-004"><data key="title">元データを変更せず派生物を別に保存する</data><data key="type">playbook</data><data key="lifecycle">candidate-standard</data><data key="confidence">0.94</data><data key="repositories">ganase/pdf2csv, ganase/stock_market_index, knockknock-at/kumonos</data></node>
+    <node id="KNO-GH-005"><data key="title">非技術者向け導入をダブルクリック中心にする</data><data key="type">playbook</data><data key="lifecycle">repeated</data><data key="confidence">0.92</data><data key="repositories">ganase/aiagent_workspace, ganase/pdf2csv, knockknock-at/cut-in-meter</data></node>
+    <node id="KNO-GH-006"><data key="title">OS権限は目的を説明してから段階的に要求する</data><data key="type">playbook</data><data key="lifecycle">observed</data><data key="confidence">0.90</data><data key="repositories">knockknock-at/lifeloop</data></node>
+    <node id="KNO-GH-007"><data key="title">外部AIエンジンの差をadapterへ閉じ込める</data><data key="type">decision</data><data key="lifecycle">repeated</data><data key="confidence">0.88</data><data key="repositories">ganase/c4, knockknock-at/kumonos</data></node>
+    <node id="KNO-GH-008"><data key="title">顧客別処理をpluginとCI matrixで増やす</data><data key="type">playbook</data><data key="lifecycle">observed</data><data key="confidence">0.95</data><data key="repositories">ganase/tweepybot</data></node>
+    <node id="KNO-GH-009"><data key="title">派生データにsource_fileを残す</data><data key="type">playbook</data><data key="lifecycle">observed</data><data key="confidence">0.98</data><data key="repositories">ganase/stock_market_index</data></node>
+    <edge id="EDG-GH-001" source="KNO-GH-001" target="KNO-GH-002"><data key="relation">contradicts</data></edge>
+    <edge id="EDG-GH-002" source="KNO-GH-001" target="KNO-GH-003"><data key="relation">related-to</data></edge>
+    <edge id="EDG-GH-003" source="KNO-GH-002" target="KNO-GH-005"><data key="relation">related-to</data></edge>
+    <edge id="EDG-GH-004" source="KNO-GH-003" target="KNO-GH-006"><data key="relation">related-to</data></edge>
+    <edge id="EDG-GH-005" source="KNO-GH-004" target="KNO-GH-009"><data key="relation">uses</data></edge>
+    <edge id="EDG-GH-006" source="KNO-GH-007" target="KNO-GH-008"><data key="relation">related-to</data></edge>
+    <edge id="EDG-GH-007" source="KNO-GH-005" target="KNO-GH-006"><data key="relation">related-to</data></edge>
+    <edge id="EDG-GH-008" source="KNO-GH-004" target="KNO-GH-003"><data key="relation">related-to</data></edge>
+  </graph>
+</graphml>

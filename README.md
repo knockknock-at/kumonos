@@ -26,7 +26,7 @@ AIとの会話には、多くの有用なノウハウが含まれています。
 
 現在は設計段階です。最初の実用版では、次の処理を自動化します。
 
-1. 管理者が指定したフォルダから、AIとの会話ログを集める
+1. 管理者が指定したフォルダやGitHubリポジトリから、会話ログと文書を集める
 2. 新しく追加・更新されたログだけを読み取る
 3. 長い会話から、問題、解決方法、失敗、注意点、再利用できる手順を抜き出す
 4. 似た内容をまとめ、関連する知識同士を結び付ける
@@ -94,6 +94,7 @@ KUMONOSは、この流れを自動化します。
 KUMONOSは、特定のAIエージェント、共有ストレージ、ノートアプリに依存しない独立した知識編成エンジンとして設計します。
 
 - 入力元は、設定された任意のローカルフォルダ、ネットワークフォルダ、ログ形式として扱う
+- GitHub.comとGitHub Enterpriseのリポジトリを、任意の入力元として扱う
 - Codex、Claude Code、汎用JSONL、Markdown、テキストを段階的に扱う
 - 入力ファイルを変更せず、生成物はいつでも再構築できるようにする
 - Obsidianは必須コンポーネントではなく、出力Rendererの一つとして扱う
@@ -120,8 +121,10 @@ KUMONOSは、特定のAIエージェント、共有ストレージ、ノート�
 - [要件](docs/requirements.md)
 - [暫定アーキテクチャ](docs/architecture.md)
 - [出力データと視覚化の設計](docs/output-and-visualization.md)
+- [GitHub入力の設計](docs/github-connector.md)
 - [MVPロードマップ](docs/roadmap.md)
 - [MVP出力サンプル](examples/mvp-output/README.md)
+- [公開リポジトリ由来の出力サンプル](examples/public-repositories-demo/README.md)
 
 ## ライセンス
 
