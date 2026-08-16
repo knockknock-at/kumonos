@@ -50,6 +50,94 @@ AIとの会話ログ
 
 Obsidianは、生成されたノウハウを見るための選択肢の一つです。KUMONOSを動かすためにObsidianを導入する必要はありません。
 
+### AIへの接続方法
+
+KUMONOSは、次の二つの接続方法を同じ画面から選べるようにします。
+
+- **APIを直接指定**：APIキー、モデル名、必要に応じてBase URLを入力する
+- **組織指定のAI Gateway**：管理者向け画面で生成された設定内容を貼り付ける
+
+どちらを選んでも、知識、出典、グラフ、判断候補の形式は変わりません。接続方法の違いはLLM接続部の内側だけで扱います。貼り付けた設定内容をプログラムとして実行せず、必要な接続項目だけを安全に読み取ります。
+
+### システム構成図
+
+```mermaid
+flowchart LR
+    admin["システム管理者"]
+    viewer["ナレッジ利用者"]
+
+    subgraph local_zone["ローカル：KUMONOS実行端末"]
+        direction TB
+        local_input["ローカルフォルダ<br/>AI会話ログ・業務文書"]
+        admin_ui["管理者画面<br/>初期設定・実行・レビュー"]
+        config["実行設定・利用者台帳・用語集<br/>資格情報はOS資格情報ストア"]
+        connector["Connector<br/>入力形式を統一"]
+        diff["差分検出・正規化"]
+        sanitizer["秘密情報のマスク<br/>送信範囲の確認"]
+        extractor["Knowledge Extractor<br/>問題・解決・失敗・手順を抽出"]
+        adapter["LLM Provider Adapter<br/>共通の入出力schema"]
+        resolver["Graph Resolver<br/>統合・重複排除・関係付け"]
+        store[("Graph Store<br/>ローカルSQLite")]
+        publisher["Renderer / Decision Builder<br/>閲覧物を安全に公開"]
+
+        admin_ui --> config
+        admin_ui --> connector
+        config -.-> connector
+        config -.-> adapter
+        local_input --> connector
+        connector --> diff --> sanitizer --> extractor
+        extractor <--> adapter
+        extractor --> resolver --> store --> publisher
+    end
+
+    subgraph network_zone["ネットワーク上"]
+        direction TB
+        network_input["ネットワークフォルダ<br/>AI会話ログ・業務文書"]
+        github["GitHub.com / Enterprise<br/>README・設計書・コード"]
+        output["閲覧用の公開先<br/>index.html・notes・JSON・GraphML"]
+    end
+
+    subgraph llm_zone["LLM"]
+        direction TB
+        direct["APIを直接指定"]
+        gateway["組織指定のAI Gateway"]
+    end
+
+    admin --> admin_ui
+    network_input --> connector
+    github --> connector
+    adapter <--> direct
+    adapter <--> gateway
+    publisher --> output
+    output -->|"ブラウザ・Obsidian・外部分析ツール"| viewer
+
+    classDef localNode fill:#dbeafe,stroke:#2563eb,color:#1e3a8a,stroke-width:1px;
+    classDef networkNode fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:1px;
+    classDef llmNode fill:#ffedd5,stroke:#ea580c,color:#7c2d12,stroke-width:1px;
+    classDef actorNode fill:#f3f4f6,stroke:#6b7280,color:#111827,stroke-width:1px;
+
+    class local_input,admin_ui,config,connector,diff,sanitizer,extractor,adapter,resolver,store,publisher localNode;
+    class network_input,github,output networkNode;
+    class direct,gateway llmNode;
+    class admin,viewer actorNode;
+
+    style local_zone fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    style network_zone fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#14532d
+    style llm_zone fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+```
+
+青はKUMONOSを動かすローカル端末、緑はネットワーク上の入力・公開先、橙はLLM接続先を表します。SQLiteと資格情報は実行端末側へ置き、ネットワークドライブへは閲覧用の生成物だけを公開します。
+
+### 使い始める流れ
+
+1. 管理者がインストーラーを実行し、デスクトップのKUMONOSを起動する
+2. 初回設定画面で、参照先、出力先、LLM接続、利用者の表示方法を登録する
+3. 「確認実行」で対象件数、除外件数、送信予定量、出力権限を確認する
+4. 「更新して公開」を実行し、成功後に`index.html`を開く
+5. 以後は手動実行またはWindowsタスクスケジューラで差分だけを更新する
+
+閲覧者の端末にはKUMONOSやObsidianを必須とせず、ネットワークドライブ上の`index.html`をブラウザで開くだけでも結果を確認できます。
+
 ### MVPで生成されるもの
 
 最初の実用版では、指定フォルダを処理すると次の出力を生成します。
@@ -122,6 +210,8 @@ KUMONOSは、特定のAIエージェント、共有ストレージ、ノート�
 - [暫定アーキテクチャ](docs/architecture.md)
 - [出力データと視覚化の設計](docs/output-and-visualization.md)
 - [GitHub入力の設計](docs/github-connector.md)
+- [LLM接続の設計](docs/llm-connection.md)
+- [アプリMVPの起動・設定・運用設計](docs/app-mvp.md)
 - [MVPロードマップ](docs/roadmap.md)
 - [MVP出力サンプル](examples/mvp-output/README.md)
 - [公開リポジトリ由来の出力サンプル](examples/public-repositories-demo/README.md)

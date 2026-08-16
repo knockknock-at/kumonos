@@ -13,31 +13,45 @@ KUMONOSの出力は、知識を保存するだけでなく、次の判断につ�
 
 KUMONOSは判断候補と根拠を提示する。標準化、削除、Operationへの移動は、人が決定する。
 
-MVPの`index.html`は安全に配布できる閲覧専用画面とする。判断結果はCLIで記録する。
+MVPの`index.html`は安全に配布できる閲覧専用画面とする。判断結果は実行端末の管理者画面で記録する。CLIは自動運用と障害対応のために残す。
 
 ```text
 kumonos review DEC-0001 --accept --comment "共通前処理として試行する"
 kumonos review DEC-0002 --defer  --comment "性能計測後に再確認する"
 ```
 
-## 2. MVPの出力フォルダ
+## 2. MVPの保存場所
+
+### KUMONOS実行端末
 
 ```text
-output/
-├── index.html                 # 最初に開く判断画面
-├── notes/                     # 人が読む知識ノート
-│   └── KNO-0001.md
-├── graph.json                 # システム連携用の知識グラフ
-├── graph.graphml              # Gephiなどへの受け渡し
-├── decisions.json             # 判断候補
-└── reports/
-    └── latest-run.json        # 今回の処理結果
-
-state/
-└── kumonos.db                 # 差分・出典・レビュー履歴の正本
+%ProgramData%\KUMONOS\profiles\<profile-id>\
+├── config\kumonos.yaml        # 秘密値を含まない設定
+├── state\kumonos.db           # 差分・出典・レビュー履歴の正本
+├── cache\                     # 再取得可能な一時データ
+├── logs\                      # 秘密値を除いた実行ログ
+└── backups\                   # Graph Storeの世代バックアップ
 ```
 
-`output/`はすべて再生成可能とする。`state/kumonos.db`は内部状態であり、閲覧者へそのまま配布しない。
+SQLiteはネットワークドライブ上で直接更新しない。APIキーや認証情報は設定ファイルではなく、OS資格情報ストアへ保存する。
+
+### ネットワーク上の公開先
+
+```text
+<output-root>\
+├── current\
+│   ├── index.html             # 最初に開く判断画面
+│   ├── notes\                 # 人が読む知識ノート
+│   │   └── KNO-0001.md
+│   ├── graph.json             # システム連携用の知識グラフ
+│   ├── graph.graphml          # Gephiなどへの受け渡し
+│   ├── decisions.json         # 判断候補
+│   └── reports\latest-run.json
+├── history\<run-id>\          # 必要な世代だけ保持
+└── .staging\<run-id>\         # 生成途中。閲覧対象外
+```
+
+公開物はすべてGraph Storeから再生成可能とする。生成・検証に成功した場合だけ`current`を切り替え、失敗時は前回成功した内容を維持する。一つの出力先には、一つの`security_scope`に属するprofileだけを公開する。
 
 ## 3. 出力と判断の対応
 
@@ -79,6 +93,16 @@ state/
 - 初期表示は「要確認の知識とその近傍」に絞り、全件表示による毛玉状態を避ける。
 
 色だけに意味を依存せず、文字ラベルも併記する。
+
+### 利用者名の表示
+
+- 内部では変更しない`owner_id`を使う。
+- profileで実名表示が許可された場合だけ`display_name`を表示する。
+- 匿名表示では`privacy_label`を使う。
+- 初期表示は「3名の利用者で確認」のような集計を優先する。
+- 未割当の人物をフォルダ名やOSログイン名のまま公開しない。
+
+閲覧者が行う操作は、`current/index.html`をブラウザで開き、絞り込み、Node選択、根拠確認を行うことだけである。承認、保留、却下、用語修正は管理者画面から行う。静的HTMLからLLMへ追加質問する機能はMVP対象外とし、認証情報を公開物へ含めない。
 
 ## 5. `graph.json`
 
@@ -239,7 +263,9 @@ MVPでは、説明可能な規則を使って候補を作る。例として次�
 - `graph.json`をシステム連携、`graph.graphml`をGephiなどの詳細分析に使う。
 - Obsidianは`notes/`を閲覧する任意のツールとする。
 - HTML、Markdown、JSON、GraphMLはGraph Storeから再生成する。
-- MVPのGraph StoreはSQLiteとし、判断結果も同じSQLiteへ記録する。
+- MVPのGraph Storeは実行端末上のSQLiteとし、判断結果も管理者画面から同じSQLiteへ記録する。
+- 出力は`.staging/<run-id>`へ生成し、必須file、schema、リンク、秘密値混入を検査してから`current`へ切り替える。
+- 入力追加時は差分だけをLLM処理し、関係する既存Node、Edge、成熟度、判断候補を更新した後に出力一式を再生成する。
 
 ## 10. MVPで判断できることの受入確認
 
