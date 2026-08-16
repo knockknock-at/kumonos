@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "run_id": "RUN-20260816-100000",
+  "started_at": "2026-08-16T09:58:12+09:00",
+  "completed_at": "2026-08-16T10:00:00+09:00",
+  "status": "completed_with_warnings",
+  "input": {
+    "roots": 2,
+    "files_discovered": 128,
+    "files_new": 7,
+    "files_updated": 3,
+    "files_unchanged": 116,
+    "files_failed": 2
+  },
+  "knowledge": {
+    "nodes_created": 5,
+    "nodes_updated": 8,
+    "edges_created": 7,
+    "merge_candidates": 1,
+    "decision_candidates": 3
+  },
+  "safety": {
+    "masked_values": 12,
+    "excluded_files": 4
+  },
+  "errors": [
+    {
+      "source": "scope-b/session-099.jsonl",
+      "code": "INVALID_JSONL",
+      "message": "14行目を読み取れなかったため、このファイルだけを保留しました。"
+    },
+    {
+      "source": "scope-b/session-104.jsonl",
+      "code": "FILE_TOO_LARGE",
+      "message": "設定された最大サイズを超えたため処理しませんでした。"
+    }
+  ]
+}

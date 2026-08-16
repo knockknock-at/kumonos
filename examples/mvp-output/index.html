@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KUMONOS 判断ビュー — MVP出力サンプル</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17212b;
+      --muted: #687584;
+      --line: #dbe2e8;
+      --panel: #ffffff;
+      --canvas: #f4f7f8;
+      --brand: #264653;
+      --brand-soft: #e6f0f1;
+      --high: #c2413b;
+      --medium: #a46212;
+      --candidate: #138a68;
+      --repeated: #4f6fe5;
+      --observed: #d9861a;
+      --draft: #7b8491;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--canvas); }
+    button, a { font: inherit; }
+    button { color: inherit; }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 28px;
+      color: white;
+      background: var(--brand);
+    }
+
+    .brand { display: flex; align-items: baseline; gap: 12px; }
+    .brand strong { font-size: 22px; letter-spacing: .08em; }
+    .brand span { color: #c9dfe1; font-size: 14px; }
+    header small { color: #c9dfe1; }
+
+    main { max-width: 1480px; margin: 0 auto; padding: 22px; }
+    .notice {
+      margin-bottom: 16px;
+      padding: 11px 14px;
+      border: 1px solid #bfd2d5;
+      border-radius: 10px;
+      color: #35555b;
+      background: #edf6f7;
+      font-size: 14px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric, .panel {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      box-shadow: 0 2px 8px rgb(23 33 43 / 4%);
+    }
+
+    .metric { padding: 16px; }
+    .metric .value { display: block; margin-bottom: 4px; font-size: 27px; font-weight: 750; }
+    .metric .label { color: var(--muted); font-size: 13px; }
+    .metric.attention .value { color: var(--high); }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 190px minmax(480px, 1fr) 340px;
+      min-height: 540px;
+      overflow: hidden;
+    }
+
+    .filters, .details { padding: 18px; }
+    .filters { border-right: 1px solid var(--line); }
+    .details { border-left: 1px solid var(--line); }
+    .graph-area { min-width: 0; background: #fbfcfd; }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h2 { margin-bottom: 14px; font-size: 17px; }
+    h3 { margin-bottom: 8px; font-size: 14px; }
+    .muted { color: var(--muted); }
+
+    .filter-list { display: grid; gap: 8px; }
+    .filter-button {
+      width: 100%;
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      text-align: left;
+      background: white;
+      cursor: pointer;
+    }
+    .filter-button:hover { background: #f6f9fa; }
+    .filter-button.active { border-color: #6c9399; background: var(--brand-soft); font-weight: 700; }
+    .filter-count { float: right; color: var(--muted); }
+
+    .legend { display: grid; gap: 8px; margin-top: 26px; color: var(--muted); font-size: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .candidate { background: var(--candidate); }
+    .repeated { background: var(--repeated); }
+    .observed { background: var(--observed); }
+    .draft { background: var(--draft); }
+
+    .graph-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px 0;
+    }
+    .graph-head p { margin: 0; font-size: 12px; }
+    svg { display: block; width: 100%; height: 470px; }
+    .edge { stroke: #9eacb8; stroke-width: 2; opacity: .72; }
+    .edge.conflict { stroke: #c54b45; stroke-width: 3; stroke-dasharray: 8 6; }
+    .edge-label { fill: #65717d; font-size: 12px; paint-order: stroke; stroke: white; stroke-width: 5px; }
+    .node { cursor: pointer; transition: opacity .18s ease; }
+    .node circle { stroke: white; stroke-width: 5; filter: drop-shadow(0 3px 5px rgb(31 48 61 / 18%)); }
+    .node:hover circle, .node.selected circle { stroke: #17212b; }
+    .node-title { fill: #17212b; font-size: 13px; font-weight: 700; text-anchor: middle; paint-order: stroke; stroke: white; stroke-width: 5px; stroke-linejoin: round; }
+    .node-type { fill: white; font-size: 10px; font-weight: 700; text-anchor: middle; text-transform: uppercase; }
+    .hidden { opacity: .1; pointer-events: none; }
+
+    .badge {
+      display: inline-block;
+      margin: 0 5px 6px 0;
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: #34515a;
+      background: #e9f1f2;
+      font-size: 12px;
+      font-weight: 650;
+    }
+    .detail-title { margin-bottom: 8px; font-size: 20px; line-height: 1.45; }
+    .detail-summary { margin: 8px 0 18px; color: #42515e; line-height: 1.7; }
+    .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 18px; }
+    .fact { padding: 10px; border-radius: 8px; background: #f4f7f8; }
+    .fact strong { display: block; margin-bottom: 2px; font-size: 18px; }
+    .fact span { color: var(--muted); font-size: 11px; }
+    .action-box { margin-top: 16px; padding: 13px; border-left: 4px solid var(--candidate); border-radius: 6px; background: #eff8f5; }
+    .action-box p { margin-bottom: 0; line-height: 1.6; font-size: 13px; }
+    .note-link { display: inline-block; margin-top: 16px; color: #1e6571; font-weight: 700; }
+
+    .decisions { margin-top: 16px; padding: 20px; }
+    .section-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
+    .section-head p { margin: 0; font-size: 13px; }
+    .decision-list { display: grid; gap: 10px; margin-top: 14px; }
+    .decision {
+      display: grid;
+      grid-template-columns: 92px minmax(220px, 1.1fr) minmax(260px, 1.4fr) minmax(260px, 1.4fr);
+      gap: 14px;
+      align-items: start;
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      text-align: left;
+      background: white;
+      cursor: pointer;
+    }
+    .decision:hover { border-color: #829da2; background: #fbfdfd; }
+    .priority { font-size: 12px; font-weight: 750; }
+    .priority.high { color: var(--high); }
+    .priority.medium { color: var(--medium); }
+    .decision strong { display: block; margin-bottom: 5px; }
+    .decision p { margin: 0; color: #52606c; font-size: 13px; line-height: 1.55; }
+    .column-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+
+    footer { padding: 18px 4px 4px; color: var(--muted); font-size: 12px; text-align: center; }
+
+    @media (max-width: 1050px) {
+      .workspace { grid-template-columns: 170px 1fr; }
+      .details { grid-column: 1 / -1; border-top: 1px solid var(--line); border-left: 0; }
+      .decision { grid-template-columns: 80px 1fr; }
+      .decision > div:nth-child(n+3) { grid-column: 2; }
+    }
+
+    @media (max-width: 720px) {
+      header { align-items: flex-start; flex-direction: column; }
+      main { padding: 12px; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .workspace { display: block; }
+      .filters { border-right: 0; border-bottom: 1px solid var(--line); }
+      .filter-list { grid-template-columns: 1fr 1fr; }
+      .graph-area { overflow-x: auto; }
+      svg { min-width: 680px; }
+      .details { border-left: 0; }
+      .decision { display: block; }
+      .decision > div { margin-bottom: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><strong>KUMONOS</strong><span>判断ビュー</span></div>
+    <small>最終更新 2026-08-16 10:00 / 架空のサンプルデータ</small>
+  </header>
+
+  <main>
+    <div class="notice">これは設計確認用のサンプルです。グラフを眺めるだけでなく、下の判断候補から次の行動を決められるか確認してください。</div>
+
+    <section class="metrics" aria-label="概要">
+      <div class="metric attention"><span class="value">3</span><span class="label">要確認の判断候補</span></div>
+      <div class="metric"><span class="value">1</span><span class="label">標準化候補</span></div>
+      <div class="metric"><span class="value">1</span><span class="label">未解決の矛盾</span></div>
+      <div class="metric"><span class="value">80%</span><span class="label">根拠で確認済みの知識</span></div>
+    </section>
+
+    <section class="workspace panel">
+      <aside class="filters">
+        <h2>表示を絞る</h2>
+        <div class="filter-list">
+          <button class="filter-button active" data-filter="all">すべて<span class="filter-count">5</span></button>
+          <button class="filter-button" data-filter="standardize">標準化<span class="filter-count">1</span></button>
+          <button class="filter-button" data-filter="resolve-conflict">矛盾<span class="filter-count">2</span></button>
+          <button class="filter-button" data-filter="verify">要検証<span class="filter-count">1</span></button>
+        </div>
+
+        <div class="legend" aria-label="成熟度の凡例">
+          <h3>色は知識の成熟度</h3>
+          <div class="legend-item"><span class="dot candidate"></span>標準化候補</div>
+          <div class="legend-item"><span class="dot repeated"></span>複数で確認</div>
+          <div class="legend-item"><span class="dot observed"></span>根拠あり</div>
+          <div class="legend-item"><span class="dot draft"></span>仮説・要検証</div>
+        </div>
+      </aside>
+
+      <div class="graph-area">
+        <div class="graph-head">
+          <h2>知識のつながり</h2>
+          <p class="muted">Nodeを選ぶと根拠と次の行動を表示</p>
+        </div>
+        <svg viewBox="0 0 860 440" role="img" aria-label="知識ネットワークのサンプル">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#9eacb8"></path>
+            </marker>
+          </defs>
+
+          <g class="edge-group" data-source="KNO-0001" data-target="KNO-0003">
+            <line class="edge" x1="205" y1="158" x2="314" y2="292" marker-end="url(#arrow)"></line>
+            <text class="edge-label" x="238" y="228">解決する</text>
+          </g>
+          <g class="edge-group" data-source="KNO-0002" data-target="KNO-0003">
+            <line class="edge" x1="430" y1="166" x2="352" y2="292" marker-end="url(#arrow)"></line>
+            <text class="edge-label" x="400" y="232">解決する</text>
+          </g>
+          <g class="edge-group" data-source="KNO-0001" data-target="KNO-0002">
+            <line class="edge conflict" x1="232" y1="125" x2="397" y2="125"></line>
+            <text class="edge-label" x="284" y="111">矛盾・使い分け</text>
+          </g>
+          <g class="edge-group" data-source="KNO-0004" data-target="KNO-0005">
+            <line class="edge" x1="664" y1="181" x2="711" y2="301"></line>
+            <text class="edge-label" x="684" y="246">関連</text>
+          </g>
+
+          <g class="node" data-id="KNO-0001" tabindex="0" role="button" aria-label="変更検出に内容ハッシュを使う">
+            <circle cx="180" cy="125" r="52" fill="#4f6fe5"></circle>
+            <text class="node-type" x="180" y="130">手順</text>
+            <text class="node-title" x="180" y="197"><tspan x="180">内容ハッシュで</tspan><tspan x="180" dy="18">変更検出</tspan></text>
+          </g>
+          <g class="node" data-id="KNO-0002" tabindex="0" role="button" aria-label="更新日時だけで変更を判定する">
+            <circle cx="450" cy="125" r="48" fill="#d9861a"></circle>
+            <text class="node-type" x="450" y="130">判断</text>
+            <text class="node-title" x="450" y="194"><tspan x="450">更新日時だけで</tspan><tspan x="450" dy="18">変更検出</tspan></text>
+          </g>
+          <g class="node" data-id="KNO-0003" tabindex="0" role="button" aria-label="共有フォルダの更新を見落とす">
+            <circle cx="335" cy="330" r="50" fill="#4f6fe5"></circle>
+            <text class="node-type" x="335" y="335">問題</text>
+            <text class="node-title" x="335" y="400"><tspan x="335">共有フォルダの</tspan><tspan x="335" dy="18">更新見落とし</tspan></text>
+          </g>
+          <g class="node selected" data-id="KNO-0004" tabindex="0" role="button" aria-label="LLM送信前に資格情報をマスクする">
+            <circle cx="650" cy="130" r="60" fill="#138a68"></circle>
+            <text class="node-type" x="650" y="135">手順</text>
+            <text class="node-title" x="650" y="211"><tspan x="650">資格情報を</tspan><tspan x="650" dy="18">事前マスク</tspan></text>
+          </g>
+          <g class="node" data-id="KNO-0005" tabindex="0" role="button" aria-label="AIに失敗ログの修正コマンドを作らせる">
+            <circle cx="730" cy="340" r="43" fill="#7b8491"></circle>
+            <text class="node-type" x="730" y="345">解決策</text>
+            <text class="node-title" x="730" y="402"><tspan x="730">AIで復旧コマンド</tspan><tspan x="730" dy="18">を生成</tspan></text>
+          </g>
+        </svg>
+      </div>
+
+      <aside class="details" aria-live="polite">
+        <h2>選択した知識</h2>
+        <div id="node-details"></div>
+      </aside>
+    </section>
+
+    <section class="decisions panel">
+      <div class="section-head">
+        <h2>判断候補</h2>
+        <p class="muted">優先度だけでなく、理由と次の行動を確認します</p>
+      </div>
+      <div id="decision-list" class="decision-list"></div>
+    </section>
+
+    <footer>KUMONOS MVP output design sample — この画面は架空のデータを使っています。</footer>
+  </main>
+
+  <script>
+    const nodes = {
+      "KNO-0001": {
+        id: "KNO-0001", type: "手順", title: "変更検出に内容ハッシュを使う",
+        summary: "更新日時だけに依存せず、内容ハッシュで入力の変更を判定します。",
+        lifecycle: "複数で確認", confidence: 93, evidence: 4, scopes: 3,
+        validation: "テスト済み", projects: ["共有ファイル収集", "バックアップ点検"],
+        note: "notes/KNO-0001.md", decision: "用途別の変更検出基準を決めます。"
+      },
+      "KNO-0002": {
+        id: "KNO-0002", type: "設計判断", title: "更新日時だけで変更を判定する",
+        summary: "処理速度を優先し、ファイルの更新日時とサイズで変更を判定します。",
+        lifecycle: "根拠あり", confidence: 78, evidence: 2, scopes: 2,
+        validation: "利用実績あり", projects: ["日次ログ収集"],
+        note: "notes/KNO-0002.md", decision: "内容ハッシュ方式との使い分けを決めます。"
+      },
+      "KNO-0003": {
+        id: "KNO-0003", type: "問題", title: "共有フォルダの更新を見落とす",
+        summary: "同期処理や時刻差により、更新日時だけでは内容変更を検出できない場合があります。",
+        lifecycle: "複数で確認", confidence: 91, evidence: 3, scopes: 2,
+        validation: "事象を確認済み", projects: ["共有ファイル収集", "日次ログ収集"],
+        note: "notes/KNO-0003.md", decision: "二つの解決方法の適用条件を比較します。"
+      },
+      "KNO-0004": {
+        id: "KNO-0004", type: "手順", title: "LLM送信前に資格情報をマスクする",
+        summary: "ログから資格情報らしい文字列を検出し、外部モデルへ送る前に置換します。",
+        lifecycle: "標準化候補", confidence: 96, evidence: 6, scopes: 4,
+        validation: "テスト済み", projects: ["共有ファイル収集", "問い合わせ分析", "運用記録整理"],
+        note: "notes/KNO-0004.md", decision: "セキュリティ担当が確認し、共通前処理への反映を判断します。"
+      },
+      "KNO-0005": {
+        id: "KNO-0005", type: "解決策", title: "AIに失敗ログの修正コマンドを作らせる",
+        summary: "失敗ログをAIへ渡し、復旧用コマンドの候補を生成します。",
+        lifecycle: "仮説・要検証", confidence: 72, evidence: 1, scopes: 1,
+        validation: "未検証", projects: ["運用記録整理"],
+        note: "notes/KNO-0005.md", decision: "隔離環境でdry-runし、承認とロールバック手順を記録します。"
+      }
+    };
+
+    const decisions = [
+      {
+        id: "DEC-0001", kind: "standardize", priority: "high", targets: ["KNO-0004"],
+        label: "標準化", title: "資格情報マスクを共通手順にする",
+        reason: "4つの独立した入力範囲で確認され、3件の検証済み根拠があります。",
+        action: "セキュリティ担当者を決め、Operationの共通前処理へ反映するかレビューします。"
+      },
+      {
+        id: "DEC-0002", kind: "resolve-conflict", priority: "high", targets: ["KNO-0001", "KNO-0002"],
+        label: "矛盾", title: "変更検出方法の使い分けを決める",
+        reason: "精度優先と速度優先の方法が、同じ問題の解決策として使われています。",
+        action: "ファイル数と許容処理時間を条件に比較し、用途別の採用基準を決めます。"
+      },
+      {
+        id: "DEC-0003", kind: "verify", priority: "medium", targets: ["KNO-0005"],
+        label: "要検証", title: "AI生成の復旧コマンドを安全に検証する",
+        reason: "再利用できそうですが、AIの提案以外に実行結果やテストがありません。",
+        action: "隔離したテスト環境でdry-runし、承認者とロールバック手順を記録します。"
+      }
+    ];
+
+    let activeFilter = "all";
+
+    function selectNode(id) {
+      const node = nodes[id];
+      document.querySelectorAll(".node").forEach(el => el.classList.toggle("selected", el.dataset.id === id));
+      document.getElementById("node-details").innerHTML = `
+        <span class="badge">${node.id}</span><span class="badge">${node.type}</span><span class="badge">${node.lifecycle}</span>
+        <h3 class="detail-title">${node.title}</h3>
+        <p class="detail-summary">${node.summary}</p>
+        <div class="facts">
+          <div class="fact"><strong>${node.evidence}</strong><span>根拠</span></div>
+          <div class="fact"><strong>${node.scopes}</strong><span>独立した入力範囲</span></div>
+          <div class="fact"><strong>${node.confidence}%</strong><span>確からしさ</span></div>
+          <div class="fact"><strong>${node.validation}</strong><span>検証状態</span></div>
+        </div>
+        <h3>確認された案件</h3>
+        <p class="muted">${node.projects.join(" / ")}</p>
+        <div class="action-box"><h3>次に判断すること</h3><p>${node.decision}</p></div>
+        <a class="note-link" href="${node.note}">詳しいノートと根拠を見る →</a>
+      `;
+    }
+
+    function renderDecisions() {
+      const visible = activeFilter === "all" ? decisions : decisions.filter(item => item.kind === activeFilter);
+      document.getElementById("decision-list").innerHTML = visible.map(item => `
+        <button class="decision" data-target="${item.targets[0]}">
+          <div><span class="column-label">優先度</span><span class="priority ${item.priority}">${item.priority === "high" ? "高" : "中"}・${item.label}</span></div>
+          <div><span class="column-label">判断すること</span><strong>${item.title}</strong><p>${item.targets.join(" / ")}</p></div>
+          <div><span class="column-label">候補になった理由</span><p>${item.reason}</p></div>
+          <div><span class="column-label">推奨する次の行動</span><p>${item.action}</p></div>
+        </button>
+      `).join("");
+      document.querySelectorAll(".decision").forEach(button => button.addEventListener("click", () => selectNode(button.dataset.target)));
+    }
+
+    function setFilter(filter) {
+      activeFilter = filter;
+      document.querySelectorAll(".filter-button").forEach(button => button.classList.toggle("active", button.dataset.filter === filter));
+      const targetIds = filter === "all"
+        ? Object.keys(nodes)
+        : decisions.filter(item => item.kind === filter).flatMap(item => item.targets);
+      const neighborIds = filter === "standardize" ? ["KNO-0005"] : filter === "resolve-conflict" ? ["KNO-0003"] : filter === "verify" ? ["KNO-0004"] : [];
+      const visibleIds = new Set([...targetIds, ...neighborIds]);
+      document.querySelectorAll(".node").forEach(el => el.classList.toggle("hidden", !visibleIds.has(el.dataset.id)));
+      document.querySelectorAll(".edge-group").forEach(el => {
+        const visible = visibleIds.has(el.dataset.source) && visibleIds.has(el.dataset.target);
+        el.classList.toggle("hidden", !visible);
+      });
+      renderDecisions();
+      if (targetIds[0]) selectNode(targetIds[0]);
+    }
+
+    document.querySelectorAll(".node").forEach(el => {
+      el.addEventListener("click", () => selectNode(el.dataset.id));
+      el.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") selectNode(el.dataset.id);
+      });
+    });
+    document.querySelectorAll(".filter-button").forEach(button => button.addEventListener("click", () => setFilter(button.dataset.filter)));
+
+    selectNode("KNO-0004");
+    renderDecisions();
+  </script>
+</body>
+</html>

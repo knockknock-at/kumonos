@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+  <key id="title" for="node" attr.name="title" attr.type="string"/>
+  <key id="type" for="node" attr.name="type" attr.type="string"/>
+  <key id="lifecycle" for="node" attr.name="lifecycle" attr.type="string"/>
+  <key id="confidence" for="node" attr.name="confidence" attr.type="double"/>
+  <key id="relation" for="edge" attr.name="relation" attr.type="string"/>
+  <graph id="KUMONOS" edgedefault="directed">
+    <node id="KNO-0001">
+      <data key="title">変更検出に内容ハッシュを使う</data>
+      <data key="type">playbook</data>
+      <data key="lifecycle">repeated</data>
+      <data key="confidence">0.93</data>
+    </node>
+    <node id="KNO-0002">
+      <data key="title">更新日時だけで変更を判定する</data>
+      <data key="type">decision</data>
+      <data key="lifecycle">observed</data>
+      <data key="confidence">0.78</data>
+    </node>
+    <node id="KNO-0003">
+      <data key="title">共有フォルダの更新を見落とす</data>
+      <data key="type">problem</data>
+      <data key="lifecycle">repeated</data>
+      <data key="confidence">0.91</data>
+    </node>
+    <node id="KNO-0004">
+      <data key="title">LLM送信前に資格情報をマスクする</data>
+      <data key="type">playbook</data>
+      <data key="lifecycle">candidate-standard</data>
+      <data key="confidence">0.96</data>
+    </node>
+    <node id="KNO-0005">
+      <data key="title">AIに失敗ログの修正コマンドを作らせる</data>
+      <data key="type">solution</data>
+      <data key="lifecycle">draft</data>
+      <data key="confidence">0.72</data>
+    </node>
+    <edge id="EDG-0001" source="KNO-0001" target="KNO-0003"><data key="relation">solves</data></edge>
+    <edge id="EDG-0002" source="KNO-0002" target="KNO-0003"><data key="relation">solves</data></edge>
+    <edge id="EDG-0003" source="KNO-0001" target="KNO-0002"><data key="relation">contradicts</data></edge>
+    <edge id="EDG-0004" source="KNO-0004" target="KNO-0005"><data key="relation">related-to</data></edge>
+  </graph>
+</graphml>

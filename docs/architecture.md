@@ -22,10 +22,11 @@ Manifest ◄────────────── Graph Resolver / Linker /
                                                   │
                          ┌────────────────────────┼─────────────────────┐
                          ▼                        ▼                     ▼
-                 Markdown Renderer         JSON Renderer       Review Queue
-                         │
-                         ▼
-                 Obsidian（任意）
+                 Markdown Renderer       JSON / GraphML         Decision Builder
+                         │                Renderer                    │
+                         ▼                        └──────────┬─────────┘
+                 Obsidian（任意）                           ▼
+                                                  Static HTML Renderer
 ```
 
 ## 3. コンポーネント
@@ -101,7 +102,7 @@ Extractorは既存Nodeとの統合を確定せず、候補を返す。
 - Review decision
 - Schema version
 
-初期候補はローカルで配布・バックアップしやすいSQLiteとする。ただし、正式決定はサンプルログを使ったMVP設計時のADRで行う。
+MVPの正本は、ローカルで配布・バックアップしやすいSQLiteとする。JSON、GraphML、Markdown、静的HTMLはすべてSQLiteから再生成する。この選択は実装開始時にADRとして記録し、入力規模の計測結果によって変更が必要か確認する。
 
 ### 3.7 Renderer
 
@@ -110,10 +111,13 @@ Graph Storeから派生物を生成する。
 - Obsidian互換Markdown
 - Portable Markdown
 - JSON graph
-- 標準化候補レポート
-- 将来：GraphML、静的HTML
+- GraphML graph
+- 判断候補データ
+- 静的HTML
 
 Rendererの生成物は削除しても再構築できる。
+
+静的HTMLはネットワークドライブ上で直接開けるよう、Webサーバーを必須にしない。JSONとGraphMLを正本にせず、Graph Storeから再生成できる交換用データとして扱う。
 
 ### 3.8 Review Queue
 
@@ -124,6 +128,20 @@ Rendererの生成物は削除しても再構築できる。
 - `candidate-standard`への昇格候補
 - 秘匿処理で要確認となった知識
 - 元データより閲覧範囲が広がる可能性がある出力
+
+### 3.9 Decision Builder
+
+Review Queueを、人が行動を決められる単位へ変換する。
+
+- `standardize`：正式な手順として検討する
+- `resolve-conflict`：矛盾する知識を比較する
+- `merge`：重複している可能性のある知識を統合する
+- `verify`：利用価値は高いが根拠が不足している知識を検証する
+- `reuse`：別プロジェクトへ横展開できる手順を確認する
+
+各候補には、対象Node、候補になった理由、観測数、検証状態、注意点、推奨する次の行動を含める。単一の不透明な総合点だけで優先順位を決めず、人が判断に使った信号を確認できるようにする。
+
+MVPの静的HTMLは閲覧専用とする。判断結果は、例えば`kumonos review DEC-0001 --accept`のようなCLI操作でSQLiteへ記録する。これにより、ネットワークドライブ上のHTMLから直接データを書き換えるためのWebサーバーを不要にする。
 
 ## 4. 中核データモデル
 

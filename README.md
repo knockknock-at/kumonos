@@ -50,6 +50,21 @@ AIとの会話ログ
 
 Obsidianは、生成されたノウハウを見るための選択肢の一つです。KUMONOSを動かすためにObsidianを導入する必要はありません。
 
+### MVPで生成されるもの
+
+最初の実用版では、指定フォルダを処理すると次の出力を生成します。
+
+| 出力 | 用途 |
+|---|---|
+| `index.html` | 候補、矛盾、根拠不足を確認し、次の行動を判断する |
+| `notes/` | 抽出されたノウハウを人が読む。Obsidianでも開ける |
+| `graph.json` | 知識と関係を、ほかのシステムから利用する |
+| `graph.graphml` | Gephiなどの外部グラフツールで詳しく分析する |
+| `decisions.json` | 標準化、統合、検証などの判断候補を機械的に扱う |
+| `reports/latest-run.json` | 処理件数、エラー、マスク件数を確認する |
+
+`index.html`は単なるネットワーク図ではありません。知識のつながりに加えて、KUMONOSが「なぜ今確認すべきか」と「次に何をすべきか」を表示します。
+
 ## 詳しい説明
 
 KUMONOSは、指定されたフォルダやAIエージェントの会話ログから、再利用可能なノウハウを抽出し、出典付きの知識グラフとして編成するためのオープンソース・ソフトウェアです。
@@ -104,7 +119,9 @@ KUMONOSは、特定のAIエージェント、共有ストレージ、ノート�
 
 - [要件](docs/requirements.md)
 - [暫定アーキテクチャ](docs/architecture.md)
+- [出力データと視覚化の設計](docs/output-and-visualization.md)
 - [MVPロードマップ](docs/roadmap.md)
+- [MVP出力サンプル](examples/mvp-output/README.md)
 
 ## ライセンス
 

@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-16T10:00:00+09:00",
+  "nodes": [
+    {
+      "id": "KNO-0001",
+      "type": "playbook",
+      "title": "変更検出に内容ハッシュを使う",
+      "summary": "更新日時だけに依存せず、内容ハッシュで入力の変更を判定する。",
+      "lifecycle": "repeated",
+      "confidence": 0.93,
+      "validation": "tested",
+      "evidence_count": 4,
+      "validated_evidence_count": 2,
+      "independent_scope_count": 3,
+      "projects": ["共有ファイル収集", "バックアップ点検"],
+      "last_observed_at": "2026-08-15T18:20:00+09:00",
+      "note_path": "notes/KNO-0001.md",
+      "decision_ids": ["DEC-0002"]
+    },
+    {
+      "id": "KNO-0002",
+      "type": "decision",
+      "title": "更新日時だけで変更を判定する",
+      "summary": "処理速度を優先し、ファイルの更新日時とサイズで変更を判定する。",
+      "lifecycle": "observed",
+      "confidence": 0.78,
+      "validation": "observed",
+      "evidence_count": 2,
+      "validated_evidence_count": 1,
+      "independent_scope_count": 2,
+      "projects": ["日次ログ収集"],
+      "last_observed_at": "2026-08-14T09:10:00+09:00",
+      "note_path": "notes/KNO-0002.md",
+      "decision_ids": ["DEC-0002"]
+    },
+    {
+      "id": "KNO-0003",
+      "type": "problem",
+      "title": "共有フォルダの更新を見落とす",
+      "summary": "同期処理や時刻差により、更新日時だけでは内容変更を検出できない場合がある。",
+      "lifecycle": "repeated",
+      "confidence": 0.91,
+      "validation": "observed",
+      "evidence_count": 3,
+      "validated_evidence_count": 2,
+      "independent_scope_count": 2,
+      "projects": ["共有ファイル収集", "日次ログ収集"],
+      "last_observed_at": "2026-08-15T17:40:00+09:00",
+      "note_path": "notes/KNO-0003.md",
+      "decision_ids": []
+    },
+    {
+      "id": "KNO-0004",
+      "type": "playbook",
+      "title": "LLM送信前に資格情報をマスクする",
+      "summary": "ログから資格情報らしい文字列を検出し、外部モデルへ送る前に置換する。",
+      "lifecycle": "candidate-standard",
+      "confidence": 0.96,
+      "validation": "tested",
+      "evidence_count": 6,
+      "validated_evidence_count": 3,
+      "independent_scope_count": 4,
+      "projects": ["共有ファイル収集", "問い合わせ分析", "運用記録整理"],
+      "last_observed_at": "2026-08-16T08:30:00+09:00",
+      "note_path": "notes/KNO-0004.md",
+      "decision_ids": ["DEC-0001"]
+    },
+    {
+      "id": "KNO-0005",
+      "type": "solution",
+      "title": "AIに失敗ログの修正コマンドを作らせる",
+      "summary": "失敗ログをAIへ渡し、復旧用コマンドの候補を生成する。",
+      "lifecycle": "draft",
+      "confidence": 0.72,
+      "validation": "unverified",
+      "evidence_count": 1,
+      "validated_evidence_count": 0,
+      "independent_scope_count": 1,
+      "projects": ["運用記録整理"],
+      "last_observed_at": "2026-08-15T11:05:00+09:00",
+      "note_path": "notes/KNO-0005.md",
+      "decision_ids": ["DEC-0003"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "EDG-0001",
+      "source": "KNO-0001",
+      "target": "KNO-0003",
+      "type": "solves",
+      "confidence": 0.94,
+      "evidence_count": 3
+    },
+    {
+      "id": "EDG-0002",
+      "source": "KNO-0002",
+      "target": "KNO-0003",
+      "type": "solves",
+      "confidence": 0.73,
+      "evidence_count": 1
+    },
+    {
+      "id": "EDG-0003",
+      "source": "KNO-0001",
+      "target": "KNO-0002",
+      "type": "contradicts",
+      "confidence": 0.88,
+      "evidence_count": 2
+    },
+    {
+      "id": "EDG-0004",
+      "source": "KNO-0004",
+      "target": "KNO-0005",
+      "type": "related-to",
+      "confidence": 0.82,
+      "evidence_count": 1
+    }
+  ]
+}

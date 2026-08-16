@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-16T10:00:00+09:00",
+  "items": [
+    {
+      "id": "DEC-0001",
+      "kind": "standardize",
+      "priority": "high",
+      "status": "open",
+      "target_node_ids": ["KNO-0004"],
+      "title": "資格情報マスクを共通手順にする",
+      "reason": "4つの独立した入力範囲で確認され、3件の検証済み根拠があるため。",
+      "signals": {
+        "independent_scopes": 4,
+        "projects": 3,
+        "evidence": 6,
+        "validated_evidence": 3,
+        "unresolved_conflicts": 0
+      },
+      "recommended_action": "セキュリティ担当者をレビュー担当に決め、Operationの共通前処理へ反映するか判断する。",
+      "caution": "誤検知時に業務上必要な文字列まで消さないことを確認する。"
+    },
+    {
+      "id": "DEC-0002",
+      "kind": "resolve-conflict",
+      "priority": "high",
+      "status": "open",
+      "target_node_ids": ["KNO-0001", "KNO-0002"],
+      "title": "変更検出方法の使い分けを決める",
+      "reason": "精度を優先する方法と速度を優先する方法が、同じ問題の解決策として使われているため。",
+      "signals": {
+        "independent_scopes": 3,
+        "projects": 3,
+        "evidence": 6,
+        "validated_evidence": 3,
+        "unresolved_conflicts": 1
+      },
+      "recommended_action": "ファイル数と許容処理時間を条件に比較し、用途別の採用基準を決める。",
+      "caution": "どちらか一方を削除せず、適用条件が異なる可能性を確認する。"
+    },
+    {
+      "id": "DEC-0003",
+      "kind": "verify",
+      "priority": "medium",
+      "status": "open",
+      "target_node_ids": ["KNO-0005"],
+      "title": "AI生成の復旧コマンドを安全に検証する",
+      "reason": "再利用できそうだが、AIの提案以外に実行結果やテストがないため。",
+      "signals": {
+        "independent_scopes": 1,
+        "projects": 1,
+        "evidence": 1,
+        "validated_evidence": 0,
+        "unresolved_conflicts": 0
+      },
+      "recommended_action": "隔離したテスト環境でdry-runし、承認者とロールバック手順を記録する。",
+      "caution": "生成されたコマンドを本番環境で直接実行しない。"
+    }
+  ]
+}

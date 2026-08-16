@@ -9,7 +9,7 @@
 - 1セッション当たりのサイズ、Turn数、ノイズ比率を計測
 - credential・個人識別情報の出現パターンを確認
 - 共通Session／Turn schemaを決定
-- 正本ストアのADRを作成
+- SQLiteを正本にするADRを作成し、実データ規模で妥当性を確認
 - 初期LLM provider方針を決定
 
 ### 完了条件
@@ -31,7 +31,10 @@
 - LLM provider interface
 - problem／solution／failure／playbook抽出
 - JSON graph出力
+- GraphML出力
 - Portable Markdown出力
+- 判断候補データ出力
+- サンプルデータを使った静的HTML出力
 
 ### 完了条件
 
@@ -39,6 +42,7 @@
 - 更新されたログだけを再処理できる
 - 元セッションを各Nodeから追跡できる
 - Obsidianなしで処理が完了する
+- ブラウザで判断候補と知識の関係を確認できる
 
 ## Phase 2: KUMONOSとしての知識統合
 
@@ -50,6 +54,7 @@
 - `repeated`／`candidate-standard`候補の生成
 - review queue
 - Obsidian Markdown Renderer
+- 実データを使った静的HTMLの絞り込み・詳細表示
 
 ### 完了条件
 
@@ -64,7 +69,6 @@
 - 排他制御と障害回復
 - 利用量・費用上限
 - 部署・アクセス範囲別の出力分離
-- 静的HTML Renderer
 - 監査・保持期間設定
 - schema migration
 - バックアップ・restore手順
