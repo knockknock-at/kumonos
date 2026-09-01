@@ -1,0 +1,6 @@
+{
+  "output_root": "output",
+  "include": [
+    "*.jsonl"
+  ]
+}

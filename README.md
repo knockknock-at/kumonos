@@ -204,6 +204,47 @@ KUMONOSは、特定のAIエージェント、共有ストレージ、ノート�
 
 現在は要件定義・アーキテクチャ設計段階です。最初のMVPでは、少人数分のCodex／Claude Codeログを差分処理し、「問題と解決」「失敗と注意点」「再利用可能な手順」を出典付きMarkdownとグラフデータへ変換することを目標とします。
 
+## 現在の使い方(CLI)
+
+管理者画面やインストーラーはまだ無く、現時点ではコマンドラインから直接実行します。
+
+### 初期設定
+
+1. Python 3.11以上を用意する。
+2. リポジトリのルートで、この端末が参照するログの場所を設定する。個人の絶対パスは`kumonos.local.json`(gitで管理しない、端末ごとのローカル設定)に保存され、バージョン管理対象の`kumonos.json`には含まれない。
+
+   ```bash
+   cd kumonos
+   python -m kumonos.cli config --config kumonos.json --input-root "<Codex/Claude Codeのログが置かれている絶対パス>"
+   ```
+
+   `--input-root`には複数人分のログがぶら下がる親フォルダ(例: `Documents\Logs\`)を指定する。個人フォルダ名(`Documents\Logs\<ユーザー名>\...`)は自動的に`owner_id`として扱われる。
+
+### 実行方法
+
+```bash
+python -m kumonos.cli compile --config kumonos.json
+```
+
+差分(内容ハッシュが変わったファイル)だけを再処理し、`output/current/`配下の出力を更新する。Windowsから直接実行したい場合は`run_kumonos_compile.cmd`を使う(実行ログは`logs/compile.log`に記録される)。
+
+現在の知識件数だけを確認したい場合:
+
+```bash
+python -m kumonos.cli status --config kumonos.json
+```
+
+生成される出力は「MVPで生成されるもの」の表の通り。`index.html`はブラウザで開くだけで種別ごとの一覧とネットワーク図を確認できる。より詳しく調べたい場合は`output/current/graph.graphml`をGephi等で開く(インポート後、レイアウトでForce Atlas 2などを実行する)、または`tools/pyvis_preview.py`(要`pip install pyvis`、要インターネット接続)でドラッグ操作できるインタラクティブ版を生成する。
+
+### 定期実行方法
+
+`run_kumonos_compile.cmd`をWindowsタスクスケジューラに登録すると、手動操作なしで定期的に差分更新できる。
+
+1. タスクスケジューラで「タスクの作成」を選ぶ。
+2. トリガーを希望の間隔(例: 1日1回)に設定する。
+3. 操作に`run_kumonos_compile.cmd`のフルパスを指定する(開始フォルダはこのリポジトリのルートにする)。
+4. 実行結果は`logs/compile.log`に追記されるので、失敗の有無はそこで確認する。
+
 ## ドキュメント
 
 - [要件](docs/requirements.md)
